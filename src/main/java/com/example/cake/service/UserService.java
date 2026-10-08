@@ -14,7 +14,7 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
+// Set user service how to store data
     public synchronized void register(String username, String email, String password) {
         String cleanUsername = username == null ? "" : username.trim();
         String cleanEmail = email == null ? "" : email.trim();
@@ -25,6 +25,7 @@ public class UserService {
         }
 
         List<User> existingUsers = userRepository.findAll();
+        //checking user already sing up or not
         boolean duplicate = existingUsers.stream().anyMatch(user ->
                 user.username().equalsIgnoreCase(cleanUsername)
                         || user.email().equalsIgnoreCase(cleanEmail));
@@ -36,7 +37,7 @@ public class UserService {
                 .mapToLong(User::id)
                 .max()
                 .orElse(0L) + 1L;
-        userRepository.save(new User(nextId, cleanUsername, password, cleanEmail));
+        userRepository.save(new User(nextId, cleanUsername, password, cleanEmail, "Customer"));
     }
 
     private boolean containsRecordDelimiter(String value) {

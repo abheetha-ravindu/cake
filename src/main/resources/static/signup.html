@@ -57,16 +57,24 @@
             text-decoration: none;
         }
         .message {
-            color: #16803c;
             text-align: center;
             margin-bottom: 12px;
+        }
+        .success-message {
+            color: #16803c;
+        }
+        .error-message {
+            color: #b42318;
         }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>Sign Up</h2>
-        <p class="message" id="signup-message" hidden>Account created successfully.</p>
+        <p class="message success-message" id="signup-message" role="status" hidden>
+            Account created successfully.
+        </p>
+        <p class="message error-message" id="signup-error" role="alert" hidden></p>
         <form action="/signup" method="post">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Choose a username" required>
@@ -84,9 +92,17 @@
         </div>
     </div>
     <script>
-        // Show confirmation only when the server redirects after saving the user.
-        if (new URLSearchParams(window.location.search).has("success")) {
+        const signupStatus = new URLSearchParams(window.location.search);
+        if (signupStatus.has("success")) {
             document.getElementById("signup-message").hidden = false;
+        } else if (signupStatus.get("error") === "duplicate") {
+            const errorMessage = document.getElementById("signup-error");
+            errorMessage.textContent = "That username or email is already registered. Please use a different one.";
+            errorMessage.hidden = false;
+        } else if (signupStatus.get("error") === "invalid") {
+            const errorMessage = document.getElementById("signup-error");
+            errorMessage.textContent = "Please enter valid signup details.";
+            errorMessage.hidden = false;
         }
     </script>
 </body>
