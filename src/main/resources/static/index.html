@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normal Page</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --primary: #2563eb;
+        --border: #e5e7eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      header {
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+      }
+
+      nav {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .brand {
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      main {
+        padding-top: 40px;
+      }
+
+      .hero {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 40px 30px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+
+      p {
+        margin: 0 0 20px;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s ease;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #eef2ff;
+        color: var(--text);
+        border: 1px solid #dbe3ff;
+      }
+
+      .btn:hover {
+        opacity: 0.95;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 28px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 22px 20px;
+      }
+
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="brand">Cake</div>
+        <div class="nav-links">
+          <span>Home</span>
+          <span>About</span>
+          <span>Services</span>
+          <span>Contact</span>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container">
+      <main>
+        <section class="hero">
+          <h1>Welcome to our page</h1>
+          <p>
+            This is a simple and clean normal webpage with a standard layout,
+            easy to read and comfortable to use.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="/login">Login</a>
+            <a class="btn btn-secondary" href="/signup">Sign Up</a>
+          </div>
+        </section>
+
+        <section class="cards">
+          <article class="card">
+            <h2>Feature One</h2>
+            <p>Simple structure and clear content for everyday use.</p>
+          </article>
+          <article class="card">
+            <h2>Feature Two</h2>
+            <p>Responsive layout that looks good on most screen sizes.</p>
+          </article>
+          <article class="card">
+            <h2>Feature Three</h2>
+            <p>Clean styling that keeps the page professional and readable.</p>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
