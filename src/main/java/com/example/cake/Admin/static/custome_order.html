@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Order</title>
+  <style>
+    :root {
+      --primary: #fa7c8a;
+      --primary-dark: #fd344a;
+      --accent: #C88D44;
+      --accent-soft: #FDF4E7;
+      --soft: #FFFDF9;
+      --text: #2C1E16;
+      --muted: #5E4D43;
+      --line: #EADBCE;
+      --success: #1f9d6a;
+      --shadow: 0 8px 24px rgba(60, 35, 18, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      background: var(--soft);
+      color: var(--text);
+    }
+
+    .page {
+      flex: 1;
+      min-width: 0;
+      max-width: none;
+      width: auto;
+      margin: 0;
+      padding: 32px;
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: linear-gradient(180deg, #fffaf4 0%, #fff0f3 100%);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(78, 48, 25, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 18px;
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+    }
+
+    .nav-section {
+      margin-top: 14px;
+      padding-top: 10px;
+    }
+
+    .nav-title {
+      margin: 12px 10px 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin: 2px 0;
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.96rem;
+      text-decoration: none;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(250, 124, 138, 0.12);
+      color: var(--primary-dark);
+    }
+
+    .nav-item.active {
+      font-weight: 700;
+    }
+
+    .nav-item .icon {
+      width: 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .header {
+      background: linear-gradient(135deg, rgba(250, 124, 138, 0.16), rgba(200, 141, 68, 0.14));
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px 32px;
+      box-shadow: 0 4px 20px rgba(78, 48, 25, 0.08);
+      margin-bottom: 22px;
+    }
+
+    .header .badge {
+      margin-bottom: 8px;
+      color: var(--primary-dark);
+      background: rgba(250, 124, 138, 0.12);
+      letter-spacing: 0.08em;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.04em;
+    }
+
+    .header p {
+      margin: 10px 0 0;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+      align-items: start;
+      gap: 18px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 4px 20px rgba(78, 48, 25, 0.08);
+      padding: 24px;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      font-size: 1.3rem;
+      color: var(--primary-dark);
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    form {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #e8d9d5;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px 14px;
+      font-size: 0.98rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(127, 59, 46, 0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .chip.selected {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border-color: var(--primary-dark);
+      box-shadow: 0 10px 18px rgba(201, 44, 61, 0.18);
+    }
+
+    .summary {
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary-card {
+      background: linear-gradient(180deg, #fffaf8, #fff);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 12px;
+      color: var(--primary-dark);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .total {
+      margin-top: 12px;
+      padding-top: 14px;
+      border-top: 2px solid var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--primary-dark);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 12px 22px rgba(127, 59, 46, 0.2);
+    }
+
+    .secondary {
+      background: #fff;
+      color: var(--primary-dark);
+      border: 1px solid var(--line);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 820px) {
+      .admin-layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 12px 14px;
+      }
+
+      .nav-section {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-title {
+        display: none;
+      }
+
+      .page {
+        margin: 0;
+        padding: 18px 14px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar" aria-label="Admin navigation">
+      <a class="brand" href="/dashboard">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Cake Studio</span>
+      </a>
+      <nav class="nav-section" aria-label="Admin pages">
+        <div class="nav-title">Menu</div>
+        <a class="nav-item" href="/dashboard"><span class="icon">▣</span>Dashboard</a>
+        <a class="nav-item active" href="/custome_order" aria-current="page"><span class="icon">◇</span>Custom Order</a>
+        <a class="nav-item" href="/normal_orders"><span class="icon">▣</span>Normal Orders</a>
+        <a class="nav-item" href="/item"><span class="icon">▤</span>Items</a>
+        <a class="nav-item" href="/user_details"><span class="icon">◔</span>User Details</a>
+      </nav>
+    </aside>
+    <div class="page">
+    <header class="header">
+      <div class="badge">Cake Studio</div>
+      <h1>Custom Order</h1>
+      <p>Create, review, and submit a personalized cake request for your customer.</p>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <h2 class="section-title">Order Details</h2>
+        <form>
+          <div class="grid">
+            <div class="field">
+              <label for="customerName">Customer Name</label>
+              <input id="customerName" type="text" value="Aisha Rahman" />
+            </div>
+            <div class="field">
+              <label for="orderDate">Order Date</label>
+              <input id="orderDate" type="date" value="2026-10-12" />
+            </div>
+
+            <div class="field">
+              <label for="phone">Phone Number</label>
+              <input id="phone" type="tel" value="+1 (555) 210-8421" />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" value="aisha@example.com" />
+            </div>
+
+            <div class="field full">
+              <label for="eventType">Occasion</label>
+              <select id="eventType">
+                <option selected>Birthday</option>
+                <option>Wedding</option>
+                <option>Anniversary</option>
+                <option>Baby Shower</option>
+                <option>Corporate Event</option>
+                <option>Custom Celebration</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="section-title" style="margin-top: 4px;">Cake Details</h3>
+            <div class="grid">
+              <div class="field">
+                <label for="cakeShape">Cake Shape</label>
+                <select id="cakeShape">
+                  <option selected>Round</option>
+                  <option>Square</option>
+                  <option>Heart</option>
+                  <option>Custom</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="cakeFlavor">Flavor</label>
+                <select id="cakeFlavor">
+                  <option selected>Vanilla</option>
+                  <option>Chocolate</option>
+                  <option>Red Velvet</option>
+                  <option>Butter</option>
+                  <option>Ribbon</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="cakeSize">Cake Size / Servings</label>
+                <select id="cakeSize">
+                  <option>Small</option>
+                  <option selected>Medium</option>
+                  <option>Large</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="filling">Filling</label>
+                <select id="filling">
+                  <option selected>Vanilla Cream</option>
+                  <option>Chocolate Buttercream</option>
+                  <option>Chocolate Ganache</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="decoration">Decoration</label>
+                <select id="decoration">
+                  <option>Simple/Minimal</option>
+                  <option selected>Floral Style</option>
+                  <option>Custom Theme</option>
+                  <option>3D Sculpted</option>
+                  <option>Fondant</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label>Toppings</label>
+                <div class="options">
+                  <label class="chip selected"><input type="checkbox" checked /> Fresh Berries</label>
+                  <label class="chip selected"><input type="checkbox" checked /> Gold Leaf</label>
+                  <label class="chip"><input type="checkbox" /> Chocolate Drip</label>
+                  <label class="chip"><input type="checkbox" /> Macarons</label>
+                  <label class="chip"><input type="checkbox" /> Fondant Flowers</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="message">Custom Message</label>
+                <textarea id="message">Happy 30th Birthday, Aisha! Love always, The Rahman Family</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="section-title">Delivery & Notes</h3>
+            <div class="grid">
+              <div class="field">
+                <label for="requiredDate">Required Date</label>
+                <input id="requiredDate" type="date" required />
+              </div>
+              <div class="field">
+                <label for="fulfillmentMethod">Fulfillment Method</label>
+                <select id="fulfillmentMethod">
+                  <option>Pickup</option>
+                  <option>Delivery</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="deliveryAddress">Delivery Address</label>
+                <input id="deliveryAddress" type="text" value="24 Willow Avenue, Apt 9B" disabled />
+              </div>
+              <div class="field">
+                <label for="deliveryTime">Preferred Time</label>
+                <input id="deliveryTime" type="time" value="18:30" />
+              </div>
+              <div class="field full">
+                <label for="notes">Special Requests</label>
+                <textarea id="notes">Please keep the design elegant with ivory and blush tones. Avoid nuts in the finishing details.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="secondary">Save Draft</button>
+            <button type="submit" class="primary">Submit Order</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="summary">
+        <div class="card summary-card">
+          <h3>Order Summary</h3>
+          <div class="row"><span>Shape</span><strong id="summaryShape">Round</strong></div>
+          <div class="row"><span>Occasion</span><strong id="summaryOccasion">Birthday</strong></div>
+          <div class="row"><span>Flavor</span><strong id="summaryFlavor">Vanilla</strong></div>
+          <div class="row"><span>Size</span><strong id="summarySize">Medium</strong></div>
+          <div class="row"><span>Filling</span><strong id="summaryFilling">Vanilla Cream</strong></div>
+          <div class="row"><span>Decoration</span><strong id="summaryDecoration">Floral Style</strong></div>
+          <div class="row"><span>Required Date</span><strong id="summaryDate">—</strong></div>
+          <div class="row"><span>Fulfillment</span><strong id="summaryFulfillment">Pickup</strong></div>
+          <div class="total"><span>Estimated Total</span><span id="totalPrice">Rs. 0</span></div>
+        </div>
+
+        <div class="card summary-card">
+          <h3>Production Notes</h3>
+          <div class="row"><span>Prep Time</span><strong>48 hours</strong></div>
+          <div class="row"><span>Allergy Handling</span><strong>Nut-free zone</strong></div>
+          <div class="row"><span>Pickup Status</span><strong>Ready for review</strong></div>
+          <div class="row"><span>Assigned Baker</span><strong>Maria L.</strong></div>
+        </div>
+      </aside>
+    </main>
+    </div>
+  </div>
+
+  <script>
+    const sizeSelect = document.getElementById('cakeSize');
+    const totalPrice = document.getElementById('totalPrice');
+    const flavorSelect = document.getElementById('cakeFlavor');
+    const fillingSelect = document.getElementById('filling');
+    const decorationSelect = document.getElementById('decoration');
+    const shapeSelect = document.getElementById('cakeShape');
+    const occasionSelect = document.getElementById('eventType');
+    const requiredDateInput = document.getElementById('requiredDate');
+    const fulfillmentSelect = document.getElementById('fulfillmentMethod');
+    const deliveryAddressInput = document.getElementById('deliveryAddress');
+
+    function updatePrice() {
+      // Step 1: Determine cake weight from size, defaulting to 1 kg.
+      const weightBySize = { Small: 1.0, Medium: 1.5, Large: 2.5 };
+      const weight = weightBySize[sizeSelect.value] || 1.0;
+
+      // Step 2: Calculate ingredient cost, including Rs. 400 for packaging.
+      const flavorOrFilling = `${flavorSelect.value} ${fillingSelect.value}`.toLowerCase();
+      const baseFlavorRate = flavorOrFilling.includes('chocolate') ? 1800 : 1200;
+      const ingredientCost = (baseFlavorRate * weight) + 400;
+
+      // Step 3: Calculate labor from the base time plus decoration time.
+      let estimatedHours = 2.0;
+      if (['Floral Style', 'Custom Theme'].includes(decorationSelect.value)) {
+        estimatedHours += 1.5;
+      } else if (['3D Sculpted', 'Fondant'].includes(decorationSelect.value)) {
+        estimatedHours += 3.0;
+      }
+      const laborCost = estimatedHours * 500;
+
+      // Step 4: Add 15% overhead to ingredient and labor costs.
+      const overheadCost = (ingredientCost + laborCost) * 0.15;
+
+      // Step 5: Apply the decoration complexity multiplier.
+      const complexityMultiplier = {
+        'Simple/Minimal': 1.2,
+        'Floral Style': 1.4,
+        'Custom Theme': 1.4,
+        '3D Sculpted': 1.8
+      }[decorationSelect.value] || 1.0;
+
+      // Step 6: Apply a 30% rush surcharge when due within one day.
+      let rushMultiplier = 1.0;
+      if (requiredDateInput.value) {
+        const [year, month, day] = requiredDateInput.value.split('-').map(Number);
+        const today = new Date();
+        const dueDate = Date.UTC(year, month - 1, day);
+        const todayDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+        const daysUntilDue = (dueDate - todayDate) / 86400000;
+        if (daysUntilDue <= 1) rushMultiplier = 1.3;
+      }
+
+      // Step 7: Add the delivery fee; pickup has no fulfillment fee.
+      const deliveryFee = fulfillmentSelect.value === 'Delivery' ? 500 : 0;
+
+      // Step 8: Calculate the final price and refresh the order summary.
+      const productionCost = (ingredientCost + laborCost + overheadCost) * complexityMultiplier;
+      const total = (productionCost * rushMultiplier) + deliveryFee;
+
+      totalPrice.textContent = `Rs. ${total.toLocaleString('en-LK', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`;
+      document.getElementById('summaryShape').textContent = shapeSelect.value;
+      document.getElementById('summaryOccasion').textContent = occasionSelect.value;
+      document.getElementById('summaryFlavor').textContent = flavorSelect.value;
+      document.getElementById('summarySize').textContent = sizeSelect.value;
+      document.getElementById('summaryFilling').textContent = fillingSelect.value;
+      document.getElementById('summaryDecoration').textContent = decorationSelect.value;
+      document.getElementById('summaryDate').textContent = requiredDateInput.value || 'Choose date';
+      document.getElementById('summaryFulfillment').textContent = fulfillmentSelect.value;
+
+      deliveryAddressInput.disabled = fulfillmentSelect.value !== 'Delivery';
+      deliveryAddressInput.required = fulfillmentSelect.value === 'Delivery';
+    }
+
+    [sizeSelect, flavorSelect, fillingSelect, decorationSelect, shapeSelect, occasionSelect, requiredDateInput, fulfillmentSelect]
+      .forEach(input => input.addEventListener('change', updatePrice));
+
+    document.querySelectorAll('.chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const input = chip.querySelector('input');
+        if (input.type === 'checkbox') {
+          const checked = input.checked;
+          input.checked = !checked;
+          chip.classList.toggle('selected', !checked);
+        }
+      });
+    });
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    requiredDateInput.min = [
+      tomorrow.getFullYear(),
+      String(tomorrow.getMonth() + 1).padStart(2, '0'),
+      String(tomorrow.getDate()).padStart(2, '0')
+    ].join('-');
+    requiredDateInput.value = requiredDateInput.min;
+
+    updatePrice();
+  </script>
+</body>
+</html>
