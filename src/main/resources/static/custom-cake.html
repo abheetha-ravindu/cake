@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Your Perfect Cake | Sweet Bloom Patisserie</title>
-    <meta name="description" content="Explore artisanal ready-made cakes, celebratory birthday cakes, or build your own custom cake tailored to your dream celebration at Sweet Bloom Patisserie.">
+    <meta name="description" content="Browse available cakes and items from Sweet Bloom Patisserie, or build your own custom cake for your celebration.">
     <!-- Google Fonts & Main Stylesheet -->
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
@@ -1233,7 +1233,7 @@
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link" id="navHome">Home</a></li>
                 <!--<li><a href="bakery.html" class="nav-link" id="navBakery">Daily Bakery</a></li>-->
-                <li><a href="custom-cake.html" class="nav-link active" id="navCustomCake">Custom Cake Booking</a></li>
+                <li><a href="custom-cake.html" class="nav-link active" id="navCustomCake">Cake Booking</a></li>
                 <!--<li><a href="orders.html" class="nav-link" id="navOrders">Order Management</a></li>-->
             </ul>
 
@@ -1288,20 +1288,20 @@
         <!-- Shape Group Navigation / Filter Chips -->
         <div class="shape-tabs-wrapper">
             <button type="button" class="shape-tab-btn active" onclick="filterShapeGroup('all', this)" id="tabAllShapes">
-                <span>🌟</span> All Ready-Made Cakes (12)
+                <span>🌟</span> All Items
             </button>
             <button type="button" class="shape-tab-btn" onclick="filterShapeGroup('Round Cake', this)" id="tabRoundShapes">
-                <span>⭕</span> Round Cakes (4)
+                <span>⭕</span> Round
             </button>
             <button type="button" class="shape-tab-btn" onclick="filterShapeGroup('Square Cake', this)" id="tabSquareShapes">
-                <span>⬛</span> Square Cakes (4)
+                <span>⬛</span> Square
             </button>
             <button type="button" class="shape-tab-btn" onclick="filterShapeGroup('Heart Cake', this)" id="tabHeartShapes">
-                <span>💖</span> Heart Cakes (4)
+                <span>💖</span> Heart
             </button>
         </div>
 
-        <!-- 12 Ready-Made Cake Products Grid (4 Cards Per Row on Desktop) -->
+        <!-- Available items from the admin item catalog -->
         <div class="cake-products-grid" id="readyMadeCakesGrid">
             <!-- Dynamically populated via JavaScript for clean maintenance and instant cart integration -->
         </div>
@@ -1312,7 +1312,7 @@
          "Celebrate with a cake made for the moment."
          6 Products from "customize cake/Birthday cakes"
          ====================================================================== -->
-    <section class="birthday-cakes-section" id="birthday-cakes">
+    <section class="birthday-cakes-section" id="birthday-cakes" hidden>
         <a id="birthday-cakes-section" style="display:none;" aria-hidden="true"></a>
         <div class="section-container">
             <div class="section-header-block">
@@ -1350,7 +1350,7 @@
                 
                 <!-- Left Column: Interactive Multi-Step Builder Form -->
                 <div class="builder-form-card">
-                    <form action="cake-booking" method="POST" id="customCakeForm" onsubmit="return handleCustomCakeSubmit(event)">
+                    <form action="/api/cakes" method="POST" enctype="multipart/form-data" id="customCakeForm" onsubmit="return handleCustomCakeSubmit(event)">
                         <input type="hidden" name="action" value="create">
                         <input type="hidden" name="shape" id="formShapeVal" value="Round">
                         <input type="hidden" name="flavor" id="formFlavorVal" value="Vanilla">
@@ -1560,7 +1560,7 @@
                                 <span class="step-hint">Have a specific design?</span>
                             </div>
                             <div class="file-upload-box" id="fileUploadContainer">
-                                <input type="file" id="refImageFile" accept="image/*" onchange="handleImageUpload(event)">
+                                <input type="file" id="refImageFile" name="refImageFile" accept="image/png,image/jpeg,image/webp" onchange="handleImageUpload(event)">
                                 <div id="uploadPlaceholder">
                                     <span style="font-size:2rem; display:block; margin-bottom:0.5rem;">📸</span>
                                     <strong style="color:var(--color-dark-roast);">Click or drag reference image here</strong>
@@ -1670,7 +1670,7 @@
                         <div class="ticket-header">
                             <span class="ticket-badge">✨ Live Booking Ticket</span>
                             <div class="ticket-cake-preview-box">
-                                <img src="Customise cake/Round Vanila cake.png" alt="Cake shape preview" id="ticketPreviewImg">
+                                <img src="3-orader bakery items or custom cake booking/base.png" alt="Cake shape preview" id="ticketPreviewImg">
                             </div>
                             <h3 class="ticket-cake-name" id="ticketCakeTitle">Round Vanilla Cake</h3>
                             <div class="ticket-piping-preview" id="ticketPipingText">"Happy Birthday..."</div>
@@ -1829,9 +1829,23 @@
          PAGE SCRIPT: DATA CATALOG & INTERACTIVE CONTROLLERS
          ====================================================================== -->
     <script>
+        const CAKE_IMAGE_FALLBACK = '3-orader bakery items or custom cake booking/base.png';
+
+        function cakeImageUrl(imagePath) {
+            if (!imagePath) return getCakeImageUrl(CAKE_IMAGE_FALLBACK);
+            if (/^(https?:|data:|\/)/i.test(imagePath)) return imagePath;
+            const encodedPath = imagePath.split('/').map(encodeURIComponent).join('/');
+            return `/images/${encodedPath}`;
+        }
+
+        function getCakeImageUrl(imagePath) {
+            if (/^(https?:|data:|\/)/i.test(imagePath)) return imagePath;
+            return imagePath.split('/').map(encodeURIComponent).join('/');
+        }
+
         /**
          * 12 READY-MADE CAKES
-         * Mapped exactly to files inside "Customise cake"
+         * Images are served from the configured cake.image-dir under /images/.
          */
         const READY_MADE_CAKES = [
             // A. ROUND CAKES (4)
@@ -1964,7 +1978,7 @@
         /**
         /**
          * 6 BIRTHDAY CAKES
-         * Mapped exactly to files inside "Customise cake/Birthday cakes"
+         * Birthday images are served from the configured cake.image-dir under /images/.
          * PROMOTION: 15% Off All Birthday Cakes (Limited Time Offer)
          */
         const BIRTHDAY_CAKES = [
@@ -2071,6 +2085,52 @@
         // Current active shape filter for ready-made cakes
         let currentShapeFilter = 'all';
 
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        async function loadStorefrontItems() {
+            const grid = document.getElementById('readyMadeCakesGrid');
+            if (grid) grid.innerHTML = '<p class="empty-state">Loading available items...</p>';
+
+            try {
+                const response = await fetch('/api/items', { headers: { Accept: 'application/json' } });
+                if (!response.ok) {
+                    throw new Error(`Item request failed with status ${response.status}`);
+                }
+
+                const items = await response.json();
+                READY_MADE_CAKES.length = 0;
+                const shapeNames = ['Round Cake', 'Square Cake', 'Heart Cake', 'Custom Cake'];
+                items.forEach(item => {
+                    const price = Number(item.price);
+                    if (!item.id || !Number.isFinite(price) || price < 0) return;
+
+                    READY_MADE_CAKES.push({
+                        id: `ADMIN-${String(item.id).replace(/[^a-zA-Z0-9_-]/g, '')}`,
+                        name: item.name || 'Bakery item',
+                        shape: shapeNames[item.shape] || 'Custom Cake',
+                        flavor: item.flavor || 'Not specified',
+                        desc: item.description || '',
+                        price,
+                        image: item.imageUrl || '',
+                        servings: item.size || 'Size not specified',
+                        category: item.category || ''
+                    });
+                });
+                renderReadyMadeCakes();
+            } catch (error) {
+                console.error('Unable to load available bakery items.', error);
+                if (grid) grid.innerHTML = '<p class="empty-state">Available items could not be loaded. Please try again later.</p>';
+            }
+        }
+
         function renderReadyMadeCakes() {
             const grid = document.getElementById('readyMadeCakesGrid');
             if (!grid) return;
@@ -2079,20 +2139,21 @@
                 ? READY_MADE_CAKES 
                 : READY_MADE_CAKES.filter(c => c.shape === currentShapeFilter);
 
-            grid.innerHTML = filtered.map(cake => `
+            grid.innerHTML = filtered.length ? filtered.map(cake => `
                 <article class="cake-card" id="card-${cake.id}">
                     <div class="cake-img-wrap">
-                        <span class="cake-card-badge">${cake.shape}</span>
-                        <img src="${cake.image}" alt="${cake.name}" class="cake-card-img" loading="lazy">
+                        <span class="cake-card-badge">${escapeHtml(cake.shape)}</span>
+                        <img src="${escapeHtml(cakeImageUrl(cake.image))}" alt="${escapeHtml(cake.name)}" class="cake-card-img" loading="lazy" onerror="this.onerror=null;this.src=getCakeImageUrl(CAKE_IMAGE_FALLBACK)">
                     </div>
                     <div class="cake-card-body">
-                        <span class="cake-flavor-tag">Flavor: ${cake.flavor}</span>
-                        <h3 class="cake-card-name">${cake.name}</h3>
-                        <p class="cake-card-desc">${cake.desc}</p>
+                        <span class="cake-flavor-tag">Flavor: ${escapeHtml(cake.flavor)}</span>
+                        ${cake.category ? `<span class="cake-flavor-tag">Category: ${escapeHtml(cake.category)}</span>` : ''}
+                        <h3 class="cake-card-name">${escapeHtml(cake.name)}</h3>
+                        <p class="cake-card-desc">${escapeHtml(cake.desc)}</p>
                         
                         <div class="cake-card-price-row">
                             <span class="cake-price-text">Rs. ${cake.price.toLocaleString()}</span>
-                            <span class="cake-portion-hint">${cake.servings}</span>
+                            <span class="cake-portion-hint">${escapeHtml(cake.servings)}</span>
                         </div>
 
                         <div class="cake-card-actions">
@@ -2108,7 +2169,7 @@
                         </div>
                     </div>
                 </article>
-            `).join('');
+            `).join('') : '<p class="empty-state">No available items found.</p>';
         }
 
         function renderBirthdayCakes() {
@@ -2119,7 +2180,7 @@
                 <article class="cake-card" id="card-${cake.id}">
                     <div class="cake-img-wrap">
                         <span class="cake-card-badge birthday-badge">${cake.badge}</span>
-                        <img src="${cake.image}" alt="${cake.name}" class="cake-card-img" loading="lazy">
+                        <img src="${cakeImageUrl(cake.image)}" alt="${cake.name}" class="cake-card-img" loading="lazy" onerror="this.onerror=null;this.src=getCakeImageUrl(CAKE_IMAGE_FALLBACK)">
                     </div>
                     <div class="cake-card-body">
                         <span class="cake-flavor-tag">Shape: ${cake.shape} &bull; ${cake.flavor}</span>
@@ -2232,6 +2293,7 @@
             container.querySelectorAll('.option-select-card').forEach(c => c.classList.remove('selected'));
             if (cardEl) cardEl.classList.add('selected');
 
+            updateCakePreviewImage();
             updateLiveTicket();
         }
 
@@ -2365,7 +2427,7 @@
             document.getElementById('formRefImageUrl').value = targetImg;
 
             const ticketImg = document.getElementById('ticketPreviewImg');
-            if (ticketImg) ticketImg.src = targetImg;
+            if (ticketImg) ticketImg.src = cakeImageUrl(targetImg);
         }
 
         function updateLiveTicket() {
@@ -2496,12 +2558,31 @@
                 }
             }
 
-            form.submit();
+            form.requestSubmit();
         }
 
-        function handleCustomCakeSubmit(e) {
-            // Form is native POST to /cake-booking
-            return true;
+        async function handleCustomCakeSubmit(e) {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const submitButton = document.getElementById('btnBookCustomCakeSubmit');
+            if (submitButton) submitButton.disabled = true;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form)
+                });
+                if (!response.ok) {
+                    const message = await response.text();
+                    throw new Error(message || `Booking failed (${response.status}).`);
+                }
+                showToast('Your cake booking was submitted successfully.');
+            } catch (error) {
+                showToast(error.message || 'Unable to submit your booking. Please try again.');
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+            }
+            return false;
         }
 
         // --------------------------------------------------------------------------
@@ -2561,10 +2642,10 @@
                 return `
                     <div class="cart-item-card">
                         <div class="cart-item-thumb">
-                            <img src="${it.image}" alt="${it.name}">
+                            <img src="${escapeHtml(cakeImageUrl(it.image))}" alt="${escapeHtml(it.name)}" onerror="this.onerror=null;this.src=getCakeImageUrl(CAKE_IMAGE_FALLBACK)">
                         </div>
                         <div class="cart-item-details">
-                            <div class="cart-item-title">${it.name}</div>
+                            <div class="cart-item-title">${escapeHtml(it.name)}</div>
                             <div class="cart-item-unit-price">Rs. ${it.price.toLocaleString()} each</div>
                             <div class="cart-item-controls">
                                 <div class="qty-stepper" style="transform:scale(0.88); transform-origin:left center;">
@@ -2644,8 +2725,9 @@
         // --------------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
             loadCart();
-            renderReadyMadeCakes();
-            renderBirthdayCakes();
+            READY_MADE_CAKES.length = 0;
+            BIRTHDAY_CAKES.length = 0;
+            loadStorefrontItems();
 
             // Set minimum required date to tomorrow
             const tomorrow = new Date();
