@@ -1,8 +1,3 @@
-# User database file for the Cake application
-# Format: id,username,password,email
-# Each line stores one user record.
-
-1,john,pass123,john@example.com
-2,alice,alice456,alice@example.com
-3,admin,admin789,admin@cake.com
-4,Abheetha,123445564,abheetharavindu0@gmail.com
+4,Abheetha,123445564,abheetharavindu0@gmail.com,Customer
+5,Abheethaeeee,12343,abheetharavidu0@gmail.com,Customer
+6,Abheethaeeeejuu,765464335,abheravindu0@gmail.com,Admin

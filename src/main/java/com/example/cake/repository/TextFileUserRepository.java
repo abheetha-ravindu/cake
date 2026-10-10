@@ -18,7 +18,8 @@ import com.example.cake.model.User;
 /**
  * File-based implementation of {@link UserRepository}.
  * Each non-comment line in the UTF-8 file stores one comma-separated user:
- * id,username,password,email.
+ * id,username,password,email,user type. Older records without a user type are
+ * treated as customer accounts.
  */
 @Repository
 public class TextFileUserRepository implements UserRepository {
@@ -57,15 +58,17 @@ public class TextFileUserRepository implements UserRepository {
 
                 // Keep trailing empty fields so malformed records are detected correctly.
                 String[] fields = line.split(",", -1);
-                if (fields.length != 4) {
+                if (fields.length != 4 && fields.length != 5) {
                     throw new IllegalStateException("Malformed user record on line " + (index + 1));
                 }
                 try {
+
                     users.add(new User(
                             Long.parseLong(fields[0].trim()),
                             fields[1].trim(),
                             fields[2],
-                            fields[3].trim()));
+                            fields[3].trim(),
+                            fields.length == 5 ? fields[4].trim() : "Customer"));
                 } catch (NumberFormatException exception) {
                     throw new IllegalStateException("Invalid user ID on line " + (index + 1), exception);
                 }
@@ -75,7 +78,7 @@ public class TextFileUserRepository implements UserRepository {
             throw new UncheckedIOException("Could not read user records from " + databasePath, exception);
         }
     }
-
+// Save users database.text
     @Override
     public void save(User user) {
         try {
@@ -93,8 +96,10 @@ public class TextFileUserRepository implements UserRepository {
                     ? ""
                     : System.lineSeparator();
             String record = linePrefix + user.id() + "," + user.username() + "," + user.password() + ","
-                    + user.email() + System.lineSeparator();
+                    + user.email() + "," + user.user_type() + System.lineSeparator();
+
             // Append rather than replacing earlier users.
+
             Files.writeString(databasePath, record, StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException exception) {

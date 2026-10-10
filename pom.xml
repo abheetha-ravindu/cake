@@ -34,6 +34,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -68,6 +72,27 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/java/com/example/cake/Admin/static</directory>
+				<targetPath>static/Admin/static</targetPath>
+				<includes>
+					<include>*.html</include>
+					<include>*.js</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java/com/example/cake/Admin/static</directory>
+				<targetPath>templates/Admin/static</targetPath>
+				<includes>
+					<include>user_details.html</include>
+					<include>item.html</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

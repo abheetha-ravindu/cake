@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finexy Dashboard</title>
+    <style>
+        :root {
+            --bg: #FFFDF9;
+            --panel: #ffffff;
+            --sidebar: #FDF8F2;
+            --heading: #2C1E16;
+            --muted: #5E4D43;
+            --line: #EADBCE;
+            --soft-line: #F7EFE6;
+            --accent: #fa7c8a;
+            --accent-deep: #fd344a;
+            --accent-soft: #FEECEF;
+            --gold: #C88D44;
+            --gold-soft: #FDF4E7;
+            --green: #1f9d6a;
+            --green-soft: #eafaf3;
+            --red: #f15f5f;
+            --red-soft: #fef0f0;
+            --shadow: 0 4px 20px rgba(78, 48, 25, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--heading);
+        }
+
+        .dashboard-shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, #fffaf4 0%, #FFF0F3 100%);
+            border-right: 1px solid var(--line);
+            padding: 18px 16px 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .brand-mark {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--gold), var(--accent));
+            position: relative;
+            display: inline-block;
+        }
+
+        .brand-mark::before {
+            content: "";
+            position: absolute;
+            inset: 6px 5px 6px 5px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            transform: rotate(45deg);
+        }
+
+        .nav-section {
+            margin-top: 14px;
+            padding-top: 10px;
+        }
+
+        .nav-title {
+            font-size: 0.76rem;
+            color: var(--muted);
+            text-transform: none;
+            margin: 12px 10px 10px;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            margin: 2px 0;
+            border-radius: 10px;
+            color: #3c3c3c;
+            text-decoration: none;
+            font-size: 0.96rem;
+        }
+        .nav-item:hover {
+            background: var(--accent-soft);
+            color: var(--accent-deep);
+        }
+
+        .nav-item .icon {
+            width: 16px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.96rem;
+        }
+
+        .nav-item.active {
+            background: rgba(250, 124, 138, 0.12);
+            color: var(--accent-deep);
+            font-weight: 700;
+            box-shadow: inset 0 0 0 1px rgba(250, 124, 138, 0.12);
+        }
+
+        .nav-item.active .icon {
+            color: var(--accent-deep);
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: #ececec;
+            color: #5b5b5b;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .main {
+            flex: 1;
+            padding: 18px 22px 30px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 8px 0 20px;
+        }
+
+        .search-wrap {
+            flex: 1;
+            max-width: 440px;
+            margin-left: auto;
+            margin-right: 10px;
+            position: relative;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+            padding: 0 42px 0 40px;
+            font-size: 0.96rem;
+            outline: none;
+            color: var(--muted);
+        }
+
+        .search-wrap .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b8b8b;
+            font-size: 1rem;
+        }
+
+        .search-wrap .shortcut {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+            color: #8a8a8a;
+            font-size: 0.7rem;
+        }
+
+        .shortcut-key {
+            min-width: 18px;
+            height: 18px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: #fff;
+            display: grid;
+            place-items: center;
+            line-height: 1;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-icon {
+            width: 32px;
+            height: 32px;
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: #5b5b5b;
+            font-size: 0.9rem;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 6px 10px 6px 6px;
+            font-size: 0.8rem;
+        }
+
+        .avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f8d9c9, #f4b196);
+            display: grid;
+            place-items: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #7d3a1d;
+        }
+
+        .content {
+            padding: 0 4px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .header-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid var(--line);
+            color: #5d5d5d;
+            font-size: 0.82rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 16px 18px 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #7a7a7a;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            background: var(--gold-soft);
+            display: grid;
+            place-items: center;
+            color: var(--gold);
+            font-size: 1rem;
+        }
+
+        .stat-value {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 2px;
+        }
+
+        .stat-value strong {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .trend {
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 999px;
+        }
+
+        .trend.up {
+            background: var(--green-soft);
+            color: var(--green);
+        }
+
+        .trend.down {
+            background: var(--red-soft);
+            color: var(--red);
+        }
+
+        .subtext {
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 18px 18px 12px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .panel-tag {
+            font-size: 0.8rem;
+            color: #6b6b6b;
+            background: transparent;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 6px 10px;
+        }
+
+        .chart-area {
+            height: 220px;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 6px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-area::before {
+            content: "";
+            position: absolute;
+            inset: 18px 0 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.025), rgba(0,0,0,0));
+            pointer-events: none;
+        }
+
+        .chart-column {
+            position: relative;
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .chart-bar {
+            width: 52%;
+            background: linear-gradient(180deg, #ff8e6b, var(--accent));
+            border-radius: 10px 10px 0 0;
+            min-height: 18px;
+            box-shadow: inset 0 -10px 16px rgba(255,255,255,0.08);
+            position: relative;
+        }
+
+        .chart-bar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                135deg,
+                rgba(255,255,255,0.12),
+                rgba(255,255,255,0.12) 4px,
+                transparent 4px,
+                transparent 8px
+            );
+            border-radius: inherit;
+        }
+
+        .x-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 8px 6px;
+            color: #7b7b7b;
+            font-size: 0.78rem;
+            margin-top: 4px;
+        }
+
+        .income-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .income-card .panel-title {
+            margin-bottom: 8px;
+        }
+
+        .income-sub {
+            color: #787878;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .mini-bars {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            align-items: end;
+            height: 140px;
+            margin-top: 12px;
+        }
+
+        .mini-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: end;
+            height: 100%;
+            gap: 8px;
+        }
+
+        .mini-bar {
+            width: 100%;
+            border-radius: 8px 8px 0 0;
+            background: linear-gradient(180deg, #ff8e6b, var(--accent));
+            min-height: 20px;
+        }
+
+        .mini-bar.dark {
+            background: linear-gradient(180deg, #292929, #111111);
+        }
+
+        .mini-bar.pink {
+            background: linear-gradient(180deg, #ffb0a0, #f55353);
+        }
+
+        .mini-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #7b7b7b;
+            font-size: 0.72rem;
+            padding: 0 4px;
+        }
+
+        .orders-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 18px 18px 10px;
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .orders-header h2 {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .orders-tools {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-small {
+            position: relative;
+        }
+
+        .search-small input {
+            width: 180px;
+            height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fff;
+            padding: 0 12px 0 32px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .search-small .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8d8d8d;
+            font-size: 0.82rem;
+        }
+
+        .filter-btn {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: #4f4f4f;
+            font-size: 0.8rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 10px;
+            color: #6c6c6c;
+            font-weight: 600;
+            border-bottom: 1px solid var(--line);
+        }
+
+        tbody td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--soft-line);
+            color: #2d2d2d;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #d5d5d5;
+            border-radius: 4px;
+            display: inline-block;
+            background: #fff;
+        }
+
+        .status {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .status.pending {
+            background: #fff1e7;
+            color: #d18a2e;
+        }
+
+        .status.completed {
+            background: #eafaf2;
+            color: #1a8d5a;
+        }
+
+        .amount {
+            font-weight: 700;
+        }
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .dashboard-shell {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .main {
+                padding: 12px 14px 20px;
+            }
+
+            .topbar {
+                flex-wrap: wrap;
+            }
+
+            .search-wrap {
+                order: 3;
+                max-width: none;
+                width: 100%;
+                margin: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar" aria-label="Admin navigation">
+            <a class="brand" href="/dashboard" style="color:inherit;text-decoration:none;">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span>Cake Studio</span>
+            </a>
+            <nav class="nav-section" aria-label="Admin pages">
+                <div class="nav-title">Menu</div>
+                <a class="nav-item active" href="/dashboard" aria-current="page"><span class="icon">▣</span>Dashboard</a>
+                <a class="nav-item" href="/custome_order"><span class="icon">◇</span>Custom Order</a>
+                <a class="nav-item" href="/normal_orders"><span class="icon">▣</span>Normal Orders</a>
+                <a class="nav-item" href="/item"><span class="icon">▤</span>Items</a>
+                <a class="nav-item" href="/user_details"><span class="icon">◔</span>User Details</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <div style="flex:1"></div>
+                <div class="search-wrap">
+                    <span class="search-icon">⌕</span>
+                    <input type="text" value="Search product" aria-label="Search product">
+                    <div class="shortcut">
+                        <span class="shortcut-key">⌘</span>
+                        <span class="shortcut-key">K</span>
+                    </div>
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="top-icon">◌</div>
+                    <div class="top-icon">◔</div>
+                    <div class="user-pill">
+                        <div class="avatar">A</div>
+                        <div>
+                            <div style="font-weight:700; line-height:1.1;">Open Studio</div>
+                            <div style="color:#8a8a8a; line-height:1.1;">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="page-header">
+                    <h1>Sales Overview</h1>
+                    <div class="header-date">📅 April 10, 2026 - May 11, 2026</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-head">
+                            <span>Total Sales</span>
+                            <span class="stat-icon">🛒</span>
+                        </div>
+                        <div class="stat-value">
+                            <strong>2500</strong>
+                            <span class="trend up">▲ 4.9%</span>
+                        </div>
+                        <div class="subtext">Last month: 2345</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-head">
+                            <span>New Customer</span>
+                            <span class="stat-icon">👥</span>
+                        </div>
+                        <div class="stat-value">
+                            <strong>110</strong>
+                            <span class="trend up">▲ 7.5%</span>
+                        </div>
+                        <div class="subtext">Last month: 89</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-head">
+                            <span>Return Products</span>
+                            <span class="stat-icon">↩</span>
+                        </div>
+                        <div class="stat-value">
+                            <strong>72</strong>
+                            <span class="trend down">▼ 6.0%</span>
+                        </div>
+                        <div class="subtext">Last month: 60</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-head">
+                            <span>Total Revenue</span>
+                            <span class="stat-icon">💰</span>
+                        </div>
+                        <div class="stat-value">
+                            <strong>$8,220.64</strong>
+                        </div>
+                        <div class="subtext">Last month: $620.00</div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Revenue analytics</h3>
+                            <button class="panel-tag">This Week ▾</button>
+                        </div>
+                        <div class="chart-area">
+                            <div class="chart-column"><div class="chart-bar" style="height: 32%;"></div></div>
+                            <div class="chart-column"><div class="chart-bar" style="height: 48%;"></div></div>
+                            <div class="chart-column"><div class="chart-bar" style="height: 60%;"></div></div>
+                            <div class="chart-column"><div class="chart-bar" style="height: 82%;"></div></div>
+                            <div class="chart-column"><div class="chart-bar" style="height: 52%;"></div></div>
+                            <div class="chart-column"><div class="chart-bar" style="height: 74%;"></div></div>
+                            <div class="chart-column"><div class="chart-bar" style="height: 66%;"></div></div>
+                        </div>
+                        <div class="x-labels">
+                            <span>Fri</span>
+                            <span>Sat</span>
+                            <span>Sun</span>
+                            <span>Mon</span>
+                            <span>Thu</span>
+                            <span>Wed</span>
+                            <span>Thurs</span>
+                        </div>
+                    </div>
+
+                    <div class="panel income-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Total Income</h3>
+                            <span class="panel-tag">View</span>
+                        </div>
+                        <div class="income-sub">View your income in a certain period of time</div>
+                        <div class="mini-bars">
+                            <div class="mini-col"><div class="mini-bar pink" style="height: 42%;"></div></div>
+                            <div class="mini-col"><div class="mini-bar dark" style="height: 62%;"></div></div>
+                            <div class="mini-col"><div class="mini-bar pink" style="height: 52%;"></div></div>
+                            <div class="mini-col"><div class="mini-bar dark" style="height: 58%;"></div></div>
+                            <div class="mini-col"><div class="mini-bar pink" style="height: 70%;"></div></div>
+                            <div class="mini-col"><div class="mini-bar dark" style="height: 65%;"></div></div>
+                        </div>
+                        <div class="mini-labels">
+                            <span>Jan</span>
+                            <span>Feb</span>
+                            <span>Mar</span>
+                            <span>Apr</span>
+                            <span>May</span>
+                            <span>Jun</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="orders-panel">
+                    <div class="orders-header">
+                        <h2>Recent orders</h2>
+                        <div class="orders-tools">
+                            <a class="filter-btn" href="/normal_orders" style="text-decoration:none;">View all orders</a>
+                            <div class="search-small">
+                                <span class="search-icon">⌕</span>
+                                <input type="text" value="Search">
+                            </div>
+                            <button class="filter-btn">Sort by ▾</button>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:40px"><span class="checkbox"></span></th>
+                                <th>Order Id</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="checkbox"></span></td>
+                                <td>#878909</td>
+                                <td>2 Dec 2026</td>
+                                <td>David John Brown</td>
+                                <td>Shoes, Shirt</td>
+                                <td><span class="status pending">Pending</span></td>
+                                <td>2 items</td>
+                                <td class="amount">$78.00</td>
+                            </tr>
+                            <tr>
+                                <td><span class="checkbox"></span></td>
+                                <td>#878909</td>
+                                <td>1 Dec 2026</td>
+                                <td>John James Smith</td>
+                                <td>Sneakers, T-shirt</td>
+                                <td><span class="status completed">Completed</span></td>
+                                <td>3 items</td>
+                                <td class="amount">$967.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
