@@ -39,7 +39,7 @@ public class UserService {
                 .orElse(0L) + 1L;
         userRepository.save(new User(nextId, cleanUsername, password, cleanEmail, "Customer"));
     }
-
+// Check if the user details contain any record delimiters
     private boolean containsRecordDelimiter(String value) {
         return value.contains(",") || value.contains("\n") || value.contains("\r");
     }
