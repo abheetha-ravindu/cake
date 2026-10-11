@@ -687,11 +687,8 @@
                 <div style="flex:1"></div>
                 <div class="search-wrap">
                     <span class="search-icon">⌕</span>
-                    <input type="text" value="Search product" aria-label="Search product">
-                    <div class="shortcut">
-                        <span class="shortcut-key">⌘</span>
-                        <span class="shortcut-key">K</span>
-                    </div>
+                    <input type="text" id="dashboardSearchInput" placeholder="Search dashboard..." aria-label="Search dashboard" onkeydown="dashboardSearchKeydown(event)" style="padding-right:80px;">
+                    <button id="dashboardSearchBtn" onclick="submitDashboardSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);height:28px;padding:0 12px;border:none;border-radius:8px;background:linear-gradient(135deg,#DF384A,#fa7c8a);color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 12px rgba(201,44,61,0.28);" aria-label="Search">Search</button>
                 </div>
 
                 <div class="topbar-actions">
@@ -714,7 +711,7 @@
                 </div>
 
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card" id="dashStatTotalSales">
                         <div class="stat-head">
                             <span>Total Sales</span>
                             <span class="stat-icon">🛒</span>
@@ -726,7 +723,7 @@
                         <div class="subtext">Last month: 2345</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" id="dashStatNewCustomer">
                         <div class="stat-head">
                             <span>New Customer</span>
                             <span class="stat-icon">👥</span>
@@ -738,7 +735,7 @@
                         <div class="subtext">Last month: 89</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" id="dashStatReturnProducts">
                         <div class="stat-head">
                             <span>Return Products</span>
                             <span class="stat-icon">↩</span>
@@ -750,7 +747,7 @@
                         <div class="subtext">Last month: 60</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" id="dashStatTotalRevenue">
                         <div class="stat-head">
                             <span>Total Revenue</span>
                             <span class="stat-icon">💰</span>
@@ -763,7 +760,7 @@
                 </div>
 
                 <div class="analytics-grid">
-                    <div class="panel">
+                    <div class="panel" id="dashRevenueAnalytics">
                         <div class="panel-header">
                             <h3 class="panel-title">Revenue analytics</h3>
                             <button class="panel-tag">This Week ▾</button>
@@ -788,7 +785,7 @@
                         </div>
                     </div>
 
-                    <div class="panel income-card">
+                    <div class="panel income-card" id="dashTotalIncome">
                         <div class="panel-header">
                             <h3 class="panel-title">Total Income</h3>
                             <span class="panel-tag">View</span>
@@ -813,7 +810,7 @@
                     </div>
                 </div>
 
-                <div class="orders-panel">
+                <div class="orders-panel" id="dashRecentOrders">
                     <div class="orders-header">
                         <h2>Recent orders</h2>
                         <div class="orders-tools">
@@ -866,5 +863,188 @@
             </div>
         </main>
     </div>
+
+<script>
+// ====================================================================
+//  ADMIN DASHBOARD — SECTION SEARCH
+// ====================================================================
+
+// Map of search terms to section IDs / highlight targets
+const DASH_SECTIONS = [
+    {
+        keys: ['total sales', 'sales', 'sold'],
+        id: 'dashStatTotalSales',
+        label: 'Total Sales'
+    },
+    {
+        keys: ['new customer', 'customers', 'customer'],
+        id: 'dashStatNewCustomer',
+        label: 'New Customer'
+    },
+    {
+        keys: ['return products', 'returns', 'returned', 'return'],
+        id: 'dashStatReturnProducts',
+        label: 'Return Products'
+    },
+    {
+        keys: ['total revenue', 'revenue'],
+        id: 'dashStatTotalRevenue',
+        label: 'Total Revenue'
+    },
+    {
+        keys: ['revenue analytics', 'analytics', 'chart'],
+        id: 'dashRevenueAnalytics',
+        label: 'Revenue Analytics'
+    },
+    {
+        keys: ['total income', 'income'],
+        id: 'dashTotalIncome',
+        label: 'Total Income'
+    },
+    {
+        keys: ['recent orders', 'orders', 'order table'],
+        id: 'dashRecentOrders',
+        label: 'Recent Orders'
+    },
+    {
+        keys: ['custom order', 'custom orders', 'custom'],
+        navHref: '/custome_order',
+        label: 'Custom Order'
+    },
+    {
+        keys: ['normal order', 'normal orders', 'normal'],
+        navHref: '/normal_orders',
+        label: 'Normal Order'
+    },
+    {
+        keys: ['items', 'item', 'products'],
+        navHref: '/item',
+        label: 'Items'
+    },
+    {
+        keys: ['user details', 'users', 'user', 'customers details'],
+        navHref: '/user_details',
+        label: 'User Details'
+    }
+];
+
+let dashSearchActive = false;
+let dashHighlighted  = [];
+
+function submitDashboardSearch() {
+    if (dashSearchActive) return;
+    const input = document.getElementById('dashboardSearchInput');
+    const btn   = document.getElementById('dashboardSearchBtn');
+    const query = (input.value || '').trim().toLowerCase();
+
+    // Button press animation
+    btn.style.transform = 'translateY(-50%) scale(0.93)';
+    setTimeout(function() { btn.style.transform = 'translateY(-50%)'; }, 160);
+
+    // Empty → clear highlights and restore
+    if (query === '') {
+        clearDashSearch();
+        return;
+    }
+
+    dashSearchActive = true;
+    clearDashHighlights();
+
+    // Match sections
+    const matches = DASH_SECTIONS.filter(s =>
+        s.keys.some(k => k.includes(query) || query.includes(k))
+    );
+
+    if (matches.length === 0) {
+        showDashNoResults(query);
+        dashSearchActive = false;
+        return;
+    }
+
+    // Separate in-page sections from navigation links
+    const inPage = matches.filter(s => s.id);
+    const navLinks = matches.filter(s => s.navHref);
+
+    if (inPage.length > 0) {
+        // Scroll to first in-page match and highlight all
+        inPage.forEach(function(s, i) {
+            const el = document.getElementById(s.id);
+            if (!el) return;
+            el.style.outline = '3px solid #fa7c8a';
+            el.style.outlineOffset = '4px';
+            el.style.borderRadius = '16px';
+            el.style.transition = 'outline 0.3s';
+            dashHighlighted.push(el);
+            if (i === 0) {
+                setTimeout(function() {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 80);
+            }
+        });
+    }
+
+    // Show nav links as a transient banner
+    if (navLinks.length > 0 && inPage.length === 0) {
+        showNavLinkBanner(navLinks, query);
+    }
+
+    dashSearchActive = false;
+}
+
+function showDashNoResults(query) {
+    removeDashBanner();
+    const banner = document.createElement('div');
+    banner.id = 'dashSearchBanner';
+    banner.style.cssText = 'position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #EADBCE;border-radius:14px;box-shadow:0 8px 32px rgba(60,35,18,0.14);padding:14px 22px;display:flex;align-items:center;gap:12px;z-index:9999;font-size:0.92rem;color:#5E4D43;min-width:280px;';
+    banner.innerHTML = '<span style="font-size:1.2rem;">&#x1F50D;</span><span>No dashboard sections matched <strong>\u201c' + escapeD(query) + '\u201d</strong>. Try: sales, revenue, orders, items.</span>' +
+        '<button onclick="clearDashSearch()" style="margin-left:auto;padding:4px 10px;border:1px solid #EADBCE;border-radius:8px;background:#fff;cursor:pointer;font-size:0.8rem;">Clear</button>';
+    document.body.appendChild(banner);
+    setTimeout(removeDashBanner, 5000);
+}
+
+function showNavLinkBanner(links, query) {
+    removeDashBanner();
+    const banner = document.createElement('div');
+    banner.id = 'dashSearchBanner';
+    banner.style.cssText = 'position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #EADBCE;border-radius:14px;box-shadow:0 8px 32px rgba(60,35,18,0.14);padding:14px 22px;display:flex;align-items:center;gap:12px;z-index:9999;font-size:0.92rem;color:#5E4D43;min-width:300px;flex-wrap:wrap;';
+    let html = '<span style="font-size:1.1rem;">&#x1F4CB;</span><span>Navigate to:</span>';
+    links.forEach(function(l) {
+        html += '<a href="' + l.navHref + '" style="padding:5px 12px;background:linear-gradient(135deg,#DF384A,#fa7c8a);color:#fff;border-radius:20px;font-size:0.82rem;font-weight:600;text-decoration:none;">' + l.label + '</a>';
+    });
+    html += '<button onclick="clearDashSearch()" style="margin-left:auto;padding:4px 10px;border:1px solid #EADBCE;border-radius:8px;background:#fff;cursor:pointer;font-size:0.8rem;">Close</button>';
+    banner.innerHTML = html;
+    document.body.appendChild(banner);
+}
+
+function removeDashBanner() {
+    const b = document.getElementById('dashSearchBanner');
+    if (b) b.remove();
+}
+
+function clearDashHighlights() {
+    dashHighlighted.forEach(function(el) {
+        el.style.outline = '';
+        el.style.outlineOffset = '';
+    });
+    dashHighlighted = [];
+}
+
+function clearDashSearch() {
+    const input = document.getElementById('dashboardSearchInput');
+    if (input) input.value = '';
+    clearDashHighlights();
+    removeDashBanner();
+    dashSearchActive = false;
+}
+
+function dashboardSearchKeydown(e) {
+    if (e.key === 'Enter') submitDashboardSearch();
+    if (e.key === 'Escape') clearDashSearch();
+}
+
+function escapeD(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 </body>
 </html>

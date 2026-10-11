@@ -100,10 +100,11 @@ a {
 .navbar-container {
     max-width: 1320px;
     margin: 0 auto;
-    padding: 1rem 1.5rem;
+    padding: 0 1.5rem;
+    height: var(--navbar-height, 76px);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 1.5rem;
 }
 
 .brand-logo {
@@ -165,14 +166,24 @@ a {
     align-items: center;
     gap: 1rem;
 }
+/* ── Navbar Search Container ── */
 .search {
     position: relative;
-    flex: 0 1 250px;
-    min-width: 150px;
-    max-width: 250px;
+    flex: 0 1 280px;
+    min-width: 160px;
+    max-width: 280px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.search::before {
+.search-input-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.search-input-wrap::before {
     content: "⌕";
     position: absolute;
     top: 50%;
@@ -181,12 +192,13 @@ a {
     color: var(--color-dark-muted);
     font-size: 1.45rem;
     pointer-events: none;
+    z-index: 1;
 }
 
 .search-input {
     width: 100%;
     min-height: 42px;
-    padding: 0.65rem 2.4rem 0.65rem 2.5rem;
+    padding: 0.65rem 0.75rem 0.65rem 2.5rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-pill);
     background: var(--color-white);
@@ -209,6 +221,103 @@ a {
 
 .search-input::-webkit-search-cancel-button {
     cursor: pointer;
+}
+
+/* ── Navbar Search Button ── */
+.search > button {
+    flex-shrink: 0;
+    height: 42px;
+    padding: 0 1.1rem;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, #DF384A 0%, var(--color-strawberry) 100%);
+    color: var(--color-white);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-shadow: var(--shadow-strawberry);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+}
+
+.search > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(201, 44, 61, 0.38);
+}
+
+/* Click / press animation */
+.search > button:active,
+.search > button.btn-pressed {
+    transform: scale(0.94) translateY(1px);
+    box-shadow: 0 2px 8px rgba(201, 44, 61, 0.28);
+}
+
+/* ── Suggestions Dropdown ── */
+.search-suggestions {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 32px rgba(60, 35, 18, 0.14);
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    z-index: 2000;
+    max-height: 280px;
+    overflow-y: auto;
+    animation: suggFadeIn 0.18s ease;
+}
+
+@keyframes suggFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.search-suggestions[hidden] {
+    display: none !important;
+}
+
+.sugg-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    color: var(--color-dark-roast);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.sugg-item:hover,
+.sugg-item.is-focused {
+    background: var(--color-strawberry-light);
+    color: var(--color-strawberry);
+}
+
+.sugg-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.sugg-category {
+    font-size: 0.72rem;
+    color: var(--color-dark-muted);
+    margin-left: auto;
+    background: var(--color-cream-dark);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+/* Legacy #results list — hide it (we replaced it with proper gallery filtering) */
+#results {
+    display: none !important;
 }
 
 .gallery-search-status {
@@ -236,6 +345,152 @@ a {
 .gallery-card[hidden],
 .gallery-search-status[hidden] {
     display: none !important;
+}
+
+/* ── Gallery Search Results Grid ── */
+.gallery-results-grid {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 2rem 2rem;
+}
+
+.gallery-results-grid.is-visible {
+    display: grid;
+}
+
+/* No-results message */
+.gallery-no-results {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.gallery-no-results.is-visible {
+    display: flex;
+}
+
+.gallery-no-results-icon {
+    font-size: 3rem;
+    opacity: 0.6;
+}
+
+.gallery-no-results-title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-dark-roast);
+}
+
+.gallery-no-results-sub {
+    color: var(--color-dark-muted);
+    font-size: 0.9rem;
+}
+
+.gallery-no-results-reset {
+    margin-top: 0.5rem;
+    padding: 0.55rem 1.3rem;
+    border: 1.5px solid var(--color-strawberry);
+    border-radius: var(--radius-pill);
+    color: var(--color-strawberry);
+    font-weight: 600;
+    font-size: 0.88rem;
+    background: transparent;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.gallery-no-results-reset:hover {
+    background: var(--color-strawberry);
+    color: var(--color-white);
+}
+
+/* Push nav-actions to the right */
+.nav-actions {
+    margin-left: auto;
+}
+
+/* ── Cake-Themed Search Loading Animation ── */
+.search-loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 253, 249, 0.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: overlayFadeIn 0.2s ease;
+}
+
+.search-loading-overlay.is-active {
+    display: flex;
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.search-loading-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(60, 35, 18, 0.18);
+    padding: 2rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-width: 200px;
+}
+
+.cake-anim {
+    font-size: 2.8rem;
+    animation: cakeBounce 0.7s ease-in-out infinite alternate;
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cake-anim { animation: none; }
+}
+
+@keyframes cakeBounce {
+    0%   { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-10px) scale(1.08); }
+}
+
+.search-loading-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.search-loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-strawberry);
+    animation: dotPulse 1s ease-in-out infinite both;
+}
+
+.search-loading-dots span:nth-child(2) { animation-delay: 0.18s; }
+.search-loading-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes dotPulse {
+    0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+    40%            { transform: scale(1.1); opacity: 1; }
+}
+
+.search-loading-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-dark-muted);
+    letter-spacing: 0.02em;
 }
 
 .btn-pill {
