@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Details | Cake Studio Admin</title>
+  <style>
+    :root {
+      --bg: #fffdf9;
+      --heading: #2c1e16;
+      --muted: #5e4d43;
+      --line: #eadbce;
+      --soft-line: #f7efe6;
+      --shadow: 0 4px 20px rgba(78, 48, 25, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--heading);
+    }
+
+    .dashboard-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #fffaf4 0%, #fff0f3 100%);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 18px;
+      color: var(--heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #c88d44, #fa7c8a);
+    }
+
+    .nav-section {
+      margin-top: 14px;
+      padding-top: 10px;
+    }
+
+    .nav-title {
+      margin: 12px 10px 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin: 2px 0;
+      border-radius: 10px;
+      color: #3c3c3c;
+      font-size: 0.96rem;
+      text-decoration: none;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(250, 124, 138, 0.12);
+      color: var(--accent-deep);
+    }
+
+    .nav-item.active {
+      font-weight: 700;
+    }
+
+    .nav-item .icon {
+      width: 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 32px 28px 26px;
+      background: #f7f5f2;
+      border-bottom: 1px solid var(--line);
+      min-height: 180px;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      min-width: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0d0c3, #efbeaa);
+      color: var(--heading);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 800;
+    }
+
+    .header-copy h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 4vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    .header-copy p {
+      margin: 14px 0 0;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+
+    .content {
+      padding-top: 28px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: #fffaf7;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      min-width: 700px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 16px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--soft-line);
+      font-size: 0.98rem;
+    }
+
+    th {
+      background: #fff4f1;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tbody tr:hover {
+      background: rgba(250, 124, 138, 0.04);
+    }
+
+    .status-tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(31, 157, 106, 0.12);
+      color: #16704d;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .user-field {
+      width: 100%;
+      min-width: 110px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--heading);
+      font: inherit;
+    }
+
+    .password-cell {
+      min-width: 190px;
+    }
+
+    .password-cell span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .action-button {
+      padding: 8px 11px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .update-button { background: #9b633b; }
+    .delete-button { background: #c94d4d; }
+
+    .message {
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+    }
+
+    .message.success {
+      background: #e8f5ed;
+      color: #17663a;
+    }
+
+    .message.error {
+      background: #fff0ed;
+      color: #a52f26;
+    }
+
+    .empty-state {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .dashboard-shell { flex-direction: column; }
+      .sidebar { width: 100%; min-width: 0; min-height: 0; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; }
+      .nav-section { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0; padding: 0; }
+      .nav-title { display: none; }
+      .main { padding: 16px 14px; }
+      .page-header { min-height: 0; padding: 24px 18px; }
+      .avatar { width: 90px; height: 90px; min-width: 90px; font-size: 2.3rem; }
+      .header-copy h1 { font-size: 2.3rem; }
+      .content { padding-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Admin navigation">
+      <a class="brand" href="/dashboard">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Cake Studio</span>
+      </a>
+      <nav class="nav-section" aria-label="Admin pages">
+        <div class="nav-title">Menu</div>
+        <a class="nav-item" href="/dashboard"><span class="icon">▣</span>Dashboard</a>
+        <a class="nav-item" href="/custome_order"><span class="icon">◇</span>Custom Order</a>
+        <a class="nav-item" href="/normal_orders"><span class="icon">▣</span>Normal Orders</a>
+        <a class="nav-item" href="/item"><span class="icon">▤</span>Items</a>
+        <a class="nav-item active" href="/user_details" aria-current="page"><span class="icon">◔</span>User Details</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="page-header">
+        <div class="avatar" aria-hidden="true">US</div>
+        <div class="header-copy">
+          <h1>Users</h1>
+          <p>Registered account list</p>
+        </div>
+      </header>
+
+      <section class="content" aria-label="Registered users">
+        <div class="message"
+             th:if="${userMessage}"
+             th:classappend="${userMessageType}"
+             th:text="${userMessage}"
+             role="status"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">User ID</th>
+                <th scope="col">User Name</th>
+                <th scope="col">Password</th>
+                <th scope="col">Email</th>
+                <th scope="col">User Type</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Iterate over the list of users and display their details in the table -->
+              <tr th:each="user : ${users}">
+                <!-- Display the user ID in the first column -->
+                <td th:text="${user.id}">1</td>
+                <td>
+                  <input class="user-field"
+                         type="text"
+                         name="name"
+                         th:value="${user.name}"
+                         th:attr="form='update-user-' + ${user.id}"
+                         aria-label="User name"
+                         required>
+                </td>
+                <!-- Display the user's password in a hidden format -->
+                <td class="password-cell">
+                  <span aria-label="Current password hidden">••••••••</span>
+                  <input class="user-field"
+                         type="password"
+                         name="password"
+                         th:attr="form='update-user-' + ${user.id}"
+                         placeholder="New password (optional)"
+                         aria-label="New password">
+                </td>
+                <!-- Display the user's email -->
+                <td>
+                  <input class="user-field"
+                         type="email"
+                         name="email"
+                         th:value="${user.email}"
+                         th:attr="form='update-user-' + ${user.id}"
+                         aria-label="Email"
+                         required>
+                </td>
+                <!-- Display the user's type -->
+                <td>
+                  <input class="user-field"
+                         type="text"
+                         name="user_type"
+                         th:value="${user.user_type}"
+                         th:attr="form='update-user-' + ${user.id}"
+                         aria-label="User type"
+                         required>
+                </td>
+                <!-- Display action buttons for updating or deleting the user -->
+                <td>
+                  <div class="actions">
+                    <form th:id="'update-user-' + ${user.id}" th:action="@{/update_user}" method="post">
+                      <input type="hidden" name="id" th:value="${user.id}">
+                      <button class="action-button update-button" type="submit">Update</button>
+                    </form>
+
+                    <form th:action="@{/delete_user}" method="post">
+                      <input type="hidden" name="id" th:value="${user.id}">
+                      <button class="action-button delete-button" type="submit">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <!-- Display a message if there are no users found -->
+              <tr th:if="${#lists.isEmpty(users)}">
+                <td class="empty-state" colspan="6">No users were found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

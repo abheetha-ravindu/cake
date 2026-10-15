@@ -1,11 +1,9 @@
 package com.example.cake.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.cake.service.DuplicateUserException;
 import com.example.cake.service.UserService;
@@ -54,11 +52,10 @@ public class WebController {
             userService.register(username, email, password);
         
         } catch (DuplicateUserException exception) {
-            // Convert expected signup failures into HTTP responses the browser can understand.
-            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage(), exception);
+            return "redirect:/signup?error=duplicate";
         
         } catch (IllegalArgumentException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
+            return "redirect:/signup?error=invalid";
         
         }
         return "redirect:/signup?success";

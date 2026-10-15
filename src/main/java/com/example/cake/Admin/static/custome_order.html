@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Orders | Cake Studio Admin</title>
+  <style>
+    :root {
+      --bg: #fffdf9;
+      --heading: #2c1e16;
+      --muted: #5e4d43;
+      --line: #eadbce;
+      --shadow: 0 4px 20px rgba(78, 48, 25, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--heading);
+      font-family: "Plus Jakarta Sans", Arial, sans-serif;
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #fffaf4 0%, #fff0f3 100%);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 18px;
+      color: var(--heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #c88d44, #fa7c8a);
+    }
+
+    .nav-section {
+      margin-top: 14px;
+      padding-top: 10px;
+    }
+
+    .nav-title {
+      margin: 12px 10px 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin: 2px 0;
+      border-radius: 10px;
+      color: #3c3c3c;
+      font-size: 0.96rem;
+      text-decoration: none;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(250, 124, 138, 0.12);
+      color: #fd344a;
+    }
+
+    .nav-item.active { font-weight: 700; }
+
+    .nav-item .icon {
+      width: 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 32px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 32px;
+      background: linear-gradient(135deg, rgba(250, 124, 138, 0.16), rgba(200, 141, 68, 0.14));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+    }
+
+    .page-header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .summary-pill {
+      flex: 0 0 auto;
+      padding: 10px 16px;
+      border: 1px solid #f8d7dd;
+      border-radius: 999px;
+      background: #fff7f3;
+      color: #a52f42;
+      font-weight: 700;
+    }
+
+    .message {
+      margin: 18px 0 0;
+      padding: 12px 15px;
+      border-radius: 10px;
+    }
+
+    .message.success {
+      background: #eafaf2;
+      color: #16704d;
+    }
+
+    .message.error {
+      background: #fff0ed;
+      color: #a52f26;
+    }
+
+    .panel {
+      margin-top: 22px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .panel-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .order-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+      gap: 16px;
+    }
+
+    .order-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffaf7;
+    }
+
+    .order-image {
+      display: block;
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #fff3ed, #fff0f3);
+    }
+
+    .image-placeholder {
+      display: grid;
+      min-height: 190px;
+      place-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #fff3ed, #fff0f3);
+      color: #a52f42;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .order-details { padding: 16px; }
+
+    .order-topline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .occasion {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fff1f3;
+      color: #a52f42;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .order-id {
+      max-width: 45%;
+      color: var(--muted);
+      font-size: 0.75rem;
+      overflow-wrap: anywhere;
+      text-align: right;
+    }
+
+    .order-details h3 {
+      margin: 0 0 5px;
+      font-size: 1.1rem;
+    }
+
+    .contact {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+    }
+
+    .order-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+      margin: 0;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 0.86rem;
+    }
+
+    .order-meta div { min-width: 0; }
+    .order-meta dt { color: var(--muted); }
+    .order-meta dd {
+      margin: 3px 0 0;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .request {
+      margin: 13px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .update-panel {
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .update-button,
+    .save-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #fa7c8a, #fd344a);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .update-button {
+      width: fit-content;
+      list-style: none;
+    }
+
+    .update-button::-webkit-details-marker { display: none; }
+
+    .update-button::before {
+      content: "＋";
+      margin-right: 7px;
+    }
+
+    .update-panel[open] .update-button::before { content: "−"; }
+
+    .delete-order-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      margin-top: 10px;
+      padding: 9px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #b44343;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .delete-order-button:hover { background: #963737; }
+
+    .update-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .update-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .update-field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .update-field.wide { grid-column: 1 / -1; }
+
+    .update-field label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .update-field input,
+    .update-field textarea,
+    .update-field select {
+      width: 100%;
+      min-width: 0;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--heading);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+
+    .update-field textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .save-button { justify-self: start; }
+
+    .empty-state {
+      margin: 0;
+      padding: 28px 20px;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .admin-layout { flex-direction: column; }
+
+      .sidebar {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 12px 14px;
+      }
+
+      .nav-section {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-title { display: none; }
+      .main { padding: 20px 14px; }
+      .page-header { padding: 24px 20px; }
+    }
+
+    @media (max-width: 560px) {
+      .page-header,
+      .panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .summary-pill { align-self: flex-start; }
+    }
+
+    @media (max-width: 380px) {
+      .update-fields { grid-template-columns: 1fr; }
+      .update-field.wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar" aria-label="Admin navigation">
+      <a class="brand" href="/dashboard">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Cake Studio</span>
+      </a>
+      <nav class="nav-section" aria-label="Admin pages">
+        <div class="nav-title">Menu</div>
+        <a class="nav-item" href="/dashboard"><span class="icon">▣</span>Dashboard</a>
+        <a class="nav-item active" href="/custome_order" aria-current="page"><span class="icon">◇</span>Custom Order</a>
+        <a class="nav-item" href="/normal_orders"><span class="icon">▣</span>Normal Orders</a>
+        <a class="nav-item" href="/item"><span class="icon">▤</span>Items</a>
+        <a class="nav-item" href="/user_details"><span class="icon">◔</span>User Details</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="page-header">
+        <div>
+          <h1>Custom orders</h1>
+          <p>Review the custom cake orders saved by your customers.</p>
+        </div>
+        <div class="summary-pill"
+             th:text="${#lists.size(customOrders)} + ' orders'">0 orders</div>
+      </header>
+
+      <div class="message"
+           th:if="${customOrderMessage}"
+           th:classappend="${customOrderMessageType}"
+           th:text="${customOrderMessage}"
+           role="status"></div>
+
+      <section class="panel" aria-labelledby="saved-orders-heading">
+        <div class="panel-heading">
+          <h2 id="saved-orders-heading">Saved custom orders</h2>
+          <p>Cards are generated from saved custom order data.</p>
+        </div>
+
+        <div class="order-list" th:if="${!#lists.isEmpty(customOrders)}">
+          <article class="order-card" th:each="order : ${customOrders}">
+            <img class="order-image"
+                 th:if="${order.imageUrl != null and !#strings.isEmpty(order.imageUrl)}"
+                 th:src="${order.imageUrl}"
+                 th:alt="${'Reference cake for ' + order.name}">
+            <div class="image-placeholder"
+                 th:unless="${order.imageUrl != null and !#strings.isEmpty(order.imageUrl)}">
+              No reference image provided
+            </div>
+
+            <div class="order-details">
+              <div class="order-topline">
+                <span class="occasion"
+                      th:text="${order.occasion != null and !#strings.isEmpty(order.occasion) ? order.occasion : 'Custom cake'}">Birthday</span>
+                <span class="order-id"
+                      th:if="${order.id != null and !#strings.isEmpty(order.id)}"
+                      th:text="${'Order ' + order.id}">Order ID</span>
+              </div>
+              <h3 th:text="${order.name != null and !#strings.isEmpty(order.name) ? order.name : 'Customer'}">Customer name</h3>
+              <p class="contact">
+                <span th:if="${order.email != null and !#strings.isEmpty(order.email)}"
+                      th:text="${order.email}">customer@example.com</span>
+                <span th:if="${order.phoneNumber != null and !#strings.isEmpty(order.phoneNumber)}"
+                      th:text="${' · ' + order.phoneNumber}"> · phone number</span>
+              </p>
+
+              <dl class="order-meta">
+                <div th:if="${order.cakeFlavor != null and !#strings.isEmpty(order.cakeFlavor)}">
+                  <dt>Flavor</dt><dd th:text="${order.cakeFlavor}">Vanilla</dd>
+                </div>
+                <div th:if="${order.filling != null and !#strings.isEmpty(order.filling)}">
+                  <dt>Filling</dt><dd th:text="${order.filling}">Vanilla cream</dd>
+                </div>
+                <div th:if="${order.cakeSize != null and !#strings.isEmpty(order.cakeSize)}">
+                  <dt>Size</dt><dd th:text="${order.cakeSize}">Medium</dd>
+                </div>
+                <div th:if="${order.cakeShape != null and !#strings.isEmpty(order.cakeShape)}">
+                  <dt>Shape</dt><dd th:text="${order.cakeShape}">Round</dd>
+                </div>
+                <div th:if="${order.decoration != null and !#strings.isEmpty(order.decoration)}">
+                  <dt>Decoration</dt><dd th:text="${order.decoration}">Floral style</dd>
+                </div>
+                <div th:if="${order.requiredDate != null and !#strings.isEmpty(order.requiredDate)}">
+                  <dt>Required date</dt><dd th:text="${order.requiredDate}">2026-10-12</dd>
+                </div>
+                <div th:if="${order.preferredTime != null and !#strings.isEmpty(order.preferredTime)}">
+                  <dt>Preferred time</dt><dd th:text="${order.preferredTime}">Afternoon</dd>
+                </div>
+                <div th:if="${order.fulfillmentMethod != null and !#strings.isEmpty(order.fulfillmentMethod)}">
+                  <dt>Fulfillment</dt><dd th:text="${order.fulfillmentMethod}">Pickup</dd>
+                </div>
+                <div th:if="${order.estimatedTotal != null and !#strings.isEmpty(order.estimatedTotal)}">
+                  <dt>Estimate</dt><dd th:text="${order.estimatedTotal}">To be confirmed</dd>
+                </div>
+                <div th:if="${order.toppings != null and !#lists.isEmpty(order.toppings)}">
+                  <dt>Toppings</dt>
+                  <dd>
+                    <span th:each="topping, status : ${order.toppings}"
+                          th:text="${(status.first ? '' : ', ') + topping}">Fresh berries</span>
+                  </dd>
+                </div>
+              </dl>
+
+              <p class="request"
+                 th:if="${order.cakeMessage != null and !#strings.isEmpty(order.cakeMessage)}"
+                 th:text="${'Cake message: ' + order.cakeMessage}">Cake message</p>
+              <p class="request"
+                 th:if="${order.specialRequests != null and !#strings.isEmpty(order.specialRequests)}"
+                 th:text="${'Special requests: ' + order.specialRequests}">Special requests</p>
+              <p class="request"
+                 th:if="${order.comments != null and !#strings.isEmpty(order.comments)}"
+                 th:text="${'Comments: ' + order.comments}">Comments</p>
+              <p class="request"
+                 th:if="${order.fulfillmentMethod == 'Delivery' and order.address != null and !#strings.isEmpty(order.address)}"
+                 th:text="${'Delivery address: ' + order.address}">Delivery address</p>
+
+              <details class="update-panel">
+                <summary class="update-button">Update order</summary>
+                <form class="update-form"
+                      th:action="@{/admin/custom-orders/update}"
+                      method="post">
+                  <input type="hidden" name="id" th:value="${order.id}">
+                  <input type="hidden" name="username" th:value="${order.username}">
+                  <input type="hidden" name="imageUrl" th:value="${order.imageUrl}">
+                  <input type="hidden" name="orderDate" th:value="${order.orderDate}">
+                  <input type="hidden" name="description" th:value="${order.description}">
+
+                  <div class="update-fields">
+                    <div class="update-field">
+                      <label th:for="${'name-' + order.id}">Customer name</label>
+                      <input th:id="${'name-' + order.id}" name="name" th:value="${order.name}" maxlength="120" required>
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'email-' + order.id}">Email</label>
+                      <input th:id="${'email-' + order.id}" name="email" th:value="${order.email}" type="email" maxlength="254" required>
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'phone-' + order.id}">Phone</label>
+                      <input th:id="${'phone-' + order.id}" name="phoneNumber" th:value="${order.phoneNumber}" maxlength="40" required>
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'occasion-' + order.id}">Occasion</label>
+                      <input th:id="${'occasion-' + order.id}" name="occasion" th:value="${order.occasion}" maxlength="80" required>
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'shape-' + order.id}">Cake shape</label>
+                      <input th:id="${'shape-' + order.id}" name="cakeShape" th:value="${order.cakeShape}" maxlength="80">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'flavor-' + order.id}">Flavor</label>
+                      <input th:id="${'flavor-' + order.id}" name="cakeFlavor" th:value="${order.cakeFlavor}" maxlength="80">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'size-' + order.id}">Size</label>
+                      <input th:id="${'size-' + order.id}" name="cakeSize" th:value="${order.cakeSize}" maxlength="80">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'filling-' + order.id}">Filling</label>
+                      <input th:id="${'filling-' + order.id}" name="filling" th:value="${order.filling}" maxlength="100">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'decoration-' + order.id}">Decoration</label>
+                      <input th:id="${'decoration-' + order.id}" name="decoration" th:value="${order.decoration}" maxlength="120">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'toppings-' + order.id}">Toppings (comma-separated)</label>
+                      <input th:id="${'toppings-' + order.id}"
+                             name="toppings"
+                             th:value="${order.toppings == null ? '' : #strings.listJoin(order.toppings, ', ')}"
+                             maxlength="500">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'required-date-' + order.id}">Required date</label>
+                      <input th:id="${'required-date-' + order.id}" name="requiredDate" th:value="${order.requiredDate}" type="date" required>
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'preferred-time-' + order.id}">Preferred time</label>
+                      <input th:id="${'preferred-time-' + order.id}" name="preferredTime" th:value="${order.preferredTime}" maxlength="80">
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'fulfillment-' + order.id}">Fulfillment</label>
+                      <select th:id="${'fulfillment-' + order.id}" name="fulfillmentMethod" required>
+                        <option value="Pickup" th:selected="${order.fulfillmentMethod == 'Pickup'}">Pickup</option>
+                        <option value="Delivery" th:selected="${order.fulfillmentMethod == 'Delivery'}">Delivery</option>
+                      </select>
+                    </div>
+                    <div class="update-field">
+                      <label th:for="${'estimate-' + order.id}">Estimate</label>
+                      <input th:id="${'estimate-' + order.id}" name="estimatedTotal" th:value="${order.estimatedTotal}" maxlength="80">
+                    </div>
+                    <div class="update-field wide">
+                      <label th:for="${'address-' + order.id}">Delivery address</label>
+                      <textarea th:id="${'address-' + order.id}" name="address" th:text="${order.address}" maxlength="500"></textarea>
+                    </div>
+                    <div class="update-field wide">
+                      <label th:for="${'message-' + order.id}">Message on cake</label>
+                      <textarea th:id="${'message-' + order.id}" name="cakeMessage" th:text="${order.cakeMessage}" maxlength="500"></textarea>
+                    </div>
+                    <div class="update-field wide">
+                      <label th:for="${'requests-' + order.id}">Special requests</label>
+                      <textarea th:id="${'requests-' + order.id}" name="specialRequests" th:text="${order.specialRequests}" maxlength="1000"></textarea>
+                    </div>
+                    <div class="update-field wide">
+                      <label th:for="${'comments-' + order.id}">Comments</label>
+                      <textarea th:id="${'comments-' + order.id}" name="comments" th:text="${order.comments}" maxlength="1000"></textarea>
+                    </div>
+                  </div>
+                  <button class="save-button" type="submit">Save changes</button>
+                </form>
+              </details>
+              <form th:action="@{/admin/custom-orders/delete}" method="post">
+                <input type="hidden" name="id" th:value="${order.id}">
+                <button class="delete-order-button" type="submit">Delete order</button>
+              </form>
+            </div>
+          </article>
+        </div>
+
+        <p class="empty-state" th:if="${#lists.isEmpty(customOrders)}">
+          No custom orders have been saved yet.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
